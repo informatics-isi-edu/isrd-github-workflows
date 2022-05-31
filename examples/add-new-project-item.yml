@@ -1,0 +1,30 @@
+name: Add new issues to the project board
+
+on:
+  issues:
+    types:
+      - opened
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  call_add_issue_worklow:
+    if: github.event_name == 'issues'
+    uses: informatics-isi-edu/isrd-github-workflows/.github/workflows/add-new-issue-pr-to-project.yml@main
+    with:
+      CALLER_PROJECT_NUMBER: #Add the project number for the project board.
+      CALLER_ORGANIZATION: informatics-isi-edu
+      CALLER_NODE_ID: ${{ github.event.issue.node_id }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  
+  call_add_pullrequest_worklow:
+    if: github.event_name == 'pull_request'
+    uses: informatics-isi-edu/isrd-github-workflows/.github/workflows/add-new-issue-pr-to-project.yml@main
+    with:
+      CALLER_PROJECT_NUMBER: #Add the project number for the project board.
+      CALLER_ORGANIZATION: informatics-isi-edu
+      CALLER_NODE_ID: ${{ github.event.pull_request.node_id }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
