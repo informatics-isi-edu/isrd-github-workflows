@@ -1,0 +1,58 @@
+name: Add new issues and pull requests to project board
+
+on:
+  workflow_call:
+    inputs:
+      CALLER_ORGANIZATION:
+        required: true
+        type: string
+      CALLER_PROJECT_NUMBER:
+        required: true
+        type: number
+      CALLER_NODE_ID:
+        required: true
+        type: string
+    secrets:
+      GH_TOKEN:
+        required: true
+
+jobs:
+  add_issue_to_board:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get project node id
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          ORGANIZATION: ${{ inputs.CALLER_ORGANIZATION }}
+          PROJECT_NUMBER: ${{ inputs.CALLER_PROJECT_NUMBER }}
+        run: |
+          gh api graphql -f query='
+            query($org: String!, $number: Int!) {
+              organization(login: $org){
+                projectNext(number: $number) {
+                  id
+                  fields(first:20) {
+                    nodes {
+                      id
+                      name
+                      settings
+                    }
+                  }
+                }
+              }
+            }' -f org=$ORGANIZATION -F number=$PROJECT_NUMBER > project_data.json
+          echo 'PROJECT_ID='$(jq '.data.organization.projectNext.id' project_data.json) >> $GITHUB_ENV
+                    
+      - name: Add newly opened issue/pull request to project board
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          ISSUE_ID: ${{ inputs.CALLER_NODE_ID }}
+        run: |
+          item_id="$( gh api graphql -f query='
+            mutation($project:ID!, $issue:ID!) {
+              addProjectNextItem(input: {projectId: $project, contentId: $issue}) {
+                projectNextItem {
+                  id
+                }
+              }
+            }' -f project=$PROJECT_ID -f issue=$ISSUE_ID --jq '.data.addProjectNextItem.projectNextItem.id')"
