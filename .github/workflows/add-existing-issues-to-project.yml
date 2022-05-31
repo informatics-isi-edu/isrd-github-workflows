@@ -1,0 +1,72 @@
+name: Add existing issues in a repository to the project board
+
+on:
+  workflow_call:
+    inputs:
+      REPO_LINK:
+        required: true
+        type: string
+      ORGANIZATION:
+        required: true
+        type: string
+      PROJECT_NUMBER:
+        required: true
+        type: number
+    secrets:
+      GH_TOKEN:
+        required: true
+
+jobs:
+  get_repo_issues:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Get repository issues
+        id: set-matrix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          gh api -H "Accept: application/vnd.github.v3+json" ${{ inputs.REPO_LINK }} > issues.json
+          repo_issues=$(echo $(cat issues.json) | sed 's/ //g' )
+          echo "::set-output name=matrix::{\"include\":${repo_issues}}"
+          
+  add_issues_to_repo:
+    needs: get_repo_issues
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJSON(needs.get_repo_issues.outputs.matrix)}}
+    steps:
+      - name: Get project node id
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          gh api graphql -f query='
+            query($org: String!, $number: Int!) {
+              organization(login: $org){
+                projectNext(number: $number) {
+                  id
+                  fields(first:20) {
+                    nodes {
+                      id
+                      name
+                      settings
+                    }
+                  }
+                }
+              }
+            }' -f org=${{ inputs.ORGANIZATION }} -F number=${{ inputs.PROJECT_NUMBER }} > project_data.json
+          echo 'PROJECT_ID='$(jq '.data.organization.projectNext.id' project_data.json) >> $GITHUB_ENV
+      - name: Add the existing issue to the project
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          ISSUE_ID: ${{ matrix.node_id }}
+        run: |
+          item_id="$( gh api graphql -f query='
+            mutation($project:ID!, $issue:ID!) {
+              addProjectNextItem(input: {projectId: $project, contentId: $issue}) {
+                projectNextItem {
+                  id
+                }
+              }
+            }' -f project=$PROJECT_ID -f issue=$ISSUE_ID --jq '.data.addProjectNextItem.projectNextItem.id')"
