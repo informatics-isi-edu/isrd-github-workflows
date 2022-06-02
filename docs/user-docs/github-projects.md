@@ -78,6 +78,8 @@ To use the `add-existing-issues-to-project` workflow:
   <!-- TODO add screenshot -->
 7. The workflow shall take some time depending on the number of issues present in the repository. If the workflow is executed successfully, you will see a blue checkmark along side the workflow and the issues will be then present in the project board.
 
+Using the above automated workflow adds only the open issues to the project board with *no status* if the built-in workflow to move newly added project items to a specific status is not enabled. The closed issues are not fetched and added to the project board using this workflow.
+
 
 ### Adding new issues or pull requests to the project
 
@@ -89,7 +91,8 @@ To automate this, you may use the `add-new-project-item` workflow. To do so,
 2. Download the workflow file from [here](https://github.com/informatics-isi-edu/isrd-github-workflows/blob/main/examples/add-new-project-item.yml) into the `.github/workflows` directory. 
 3. In the workflow file update the `PROJECT_NUMBER` variable on lines 16th and 26th.
 
-Now any newly created issue or PR will trigger this workflow, which will make sure the newly added item is part of the project.
+Now any newly created issue or PR will trigger this workflow, which will make sure the newly added item is part of the project. The new issue or PR will get added to the project board with *no status* if the built-in workflow to move newly added project items to a specific status is not enabled.
+
 
 ### Keeping open/closeness of issue in sync with the status
 
