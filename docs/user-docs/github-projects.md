@@ -34,58 +34,77 @@ Based on this, the only advantage of non-beta is the easier UI for adding issues
 
 ## Using Projects (beta)
 
-We can summarize the flow of adapting GitHub Projects for a repository in the following. We will mainly focus on how you can use GitHub's UI features to do the tasks. But since our goal is to make this process easier, we will also mention how the automation may be achieved by using GitHub API or Action.
+In this section we summarize the flow of adapting GitHub Projects for a repository in the following. We will mention how you can achieve each task through GitHub UI as well as automated tools (if available).
 
 ### Setting up a project
 
-To create a project, you have to navigate to the organization page and click on create. This will create an empty project with predefined status. 
+To create a project, 
 
-The first thing that we should do is head to the "settings" page. In here, you can,
-- Change the name of the project
-- Manage user access. There are multiple levels of access that you can change:
-  - private/public: Whether people outside the organization can see it or not. 
-  - Base role: The base access level for people in your organization should be.
-  - Customized access: Modify access for individual people or teams in your organization.
-- Modify/Add custom fields. We recommend the following changes:
-  - Add or modify the predefined "status" options.
-  - Add a new "Text" custom field and call it "Epic" to mimic ZenHub's epic feature.
-
+1. Navigate to [the organization's Projects page](https://github.com/orgs/informatics-isi-edu/projects?type=beta) and click on create. This will create an empty project with predefined status. 
+2. Click on **New project** button and make sure to select the **Beta** version. This will create the project and navigate to its page.
+3. Click on the **...** on top right of the page and select **Settings**.
+4. Update the **Project name** and the rest of settings if you see fit.
+5. Click on **Manage access** on the side panel.
+6. There are multiple levels of access that you can change:
+   - private/public: Whether people outside the organization can see it or not. 
+   - Base role: The base access level for people in your organization should be.
+   - Customized access: Modify access for individual people or teams in your organization.
+7. In the **Settings** page you can also modify the custom fields. We recommend the following changes:
+   - Related to the **Status** field:
+      - Add any other extra options that you would like.
+      - Based on the current implementation of GitHub Projects, the value of this field can be empty. In most cases, the default "Done" field means the same as empty. That's why we recommend removing the "Done" field.
+    - Add a new "Text" custom field and call it "Epic" to mimic ZenHub's epic feature.
+  
 > Currently, this process cannot be automated.
 
 ### Adding existing issues to the project
 
-After setting up the project, you should start adding existing issues to the project. To do so, you can either use the GUI,
+After setting up the project, you should start adding existing issues to the project. To do so, you can either use the GUI or our custom workflow.
+
+To manually achieve this, you can either:
 - Navigate to any of the views in your project and search for the issue.
 - Navigate to the issues page of a repository and bulk add issues to the project as demonstrated in [here](https://github.blog/changelog/2022-04-07-the-new-github-issues-april-7th-update/).
 
-Instead of using the GUI, you can also use the `add-existing-issues-to-project` workflow. The steps to use the automation are as follows:
+To use the `add-existing-issues-to-project` workflow:
 
-1. Download the workflow file from [here](https://github.com/Test-Org-Nikhil/github-workflows/blob/main/.github/workflows/add-existing-issues-to-project.yml). In the workflow file update the values for the environment variables as stated:
-    i.  Set *REPO_LINK* to the repository link with issues: '/repos/*organization name*/*your repo*/issues'.
-    ii. Set *ORGANIZATION* to the name of the organization.
-    iii. Set the *PROJECT_NUMBER* to your project board number.
-2. Upload the add *add-existing-issues-to-project.yml* file in the repository containing the issues. The YAML file should be uploaded to the following location: '/*your_repo*/.github/workflows/'. Please create the *.github* and *workflows* directories if not present already.
-3. Once the workflow file is uploaded, navigate to the Actions tab in the repository.
-4. From the left-panel select the workflow named - *'Add existing issues in a repository to the project board'*. From the dropdown click on Run workflow.
-5. The workflow shall take some time depending on the number of issues present in the repository. If the workflow is executed successfully, you will see a blue checkmark along side the workflow and the issues will be then present in the project board.
+1. Create a `.github/workflows` directory in your repository on GitHub if this directory does not already exist.
+2. Download the workflow file from [here](https://github.com/informatics-isi-edu/isrd-github-workflows/blob/main/examples/add-existing-issues.yml) into the `.github/workflows` directory. 
+3. In the workflow file update the values for the environment variables as stated:
+    - Set `REPO_NAME` to the name of your repository, e.g. `REPO_NAME: chaise`
+    - Set the `PROJECT_NUMBER` to your project board number, e.g. `PROJECT_NUMBER: 3`
+4. Navigate to the **Actions** tab in the repository.
+5. From the left-panel select the workflow named **Add existing issues in a repository to the project board**. 
+6. Click on the **Run Workflow** which will open a dropdown. And then click on the **Run workflow** button in the dropdown
+  <!-- TODO add screenshot -->
+7. The workflow shall take some time depending on the number of issues present in the repository. If the workflow is executed successfully, you will see a blue checkmark along side the workflow and the issues will be then present in the project board.
 
 
 ### Adding new issues or pull requests to the project
 
 When you create a new issue, it won't automatically add to the project, and you have to add it manually.
 
-To automate this, we've prepared a "GitHub workflow" that can be included in each repository. This workflow will add any newly opened issues to the project. The steps for using the automation are as follows:
+To automate this, you may use the `add-new-project-item` workflow. To do so,
 
-1. Download the workflow file from [here](https://github.com/Test-Org-Nikhil/test-repo/blob/main/.github/workflows/add-new-project-item.yml). In the workflow file update the *CALLER_PROJECT_NUMBER* variable to the project number of your board.
-> There are currently two places where the change needs to be done for the variable - on lines 16th and 26th.
+1. Create a `.github/workflows` directory in your repository on GitHub if this directory does not already exist.
+2. Download the workflow file from [here](https://github.com/informatics-isi-edu/isrd-github-workflows/blob/main/examples/add-new-project-item.yml) into the `.github/workflows` directory. 
+3. In the workflow file update the `PROJECT_NUMBER` variable on lines 16th and 26th.
 
-2. Upload the add *add-new-project-item.yml* file in your repository. The YAML file should be uploaded to the following location: '/*your_repo*/.github/workflows/'. Please create the *.github* and *workflows* directories if not present already.
-
+Now any newly created issue or PR will trigger this workflow, which will make sure the newly added item is part of the project.
 
 ### Keeping open/closeness of issue in sync with the status
 
 After the issues are added to the project, we have to make sure their status is in sync with the state of the issue. There are two sides to this:
 
-- Closing issue should change status to Done: This can be done by activating the "Item closed" built-in workflow. To find this, navigate to the "Workflows" page in the project and ensure the "item closed" is on.
-- Changing status to Done should close the issue. This is currently not supported. We will look into whether this can be automated as well. 
+#### 1. Closing issue should change status to Done
+
+To automate this,
+
+1. Navigate to the project page.
+2. Click on the **...** on top right of the page and select **Workflows**.
+3. Make sure **Item closed** default workflow is enabled and has the proper `Status:Done` value.
+
+
+#### 2. Changing status to Done should close the issue
+
+This cannot currently be automated.
 
