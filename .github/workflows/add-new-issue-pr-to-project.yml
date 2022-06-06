@@ -3,13 +3,10 @@ name: Add new issues and pull requests to project board
 on:
   workflow_call:
     inputs:
-      CALLER_ORGANIZATION:
-        required: true
-        type: string
-      CALLER_PROJECT_NUMBER:
+      PROJECT_NUMBER:
         required: true
         type: number
-      CALLER_NODE_ID:
+      NODE_ID:
         required: true
         type: string
     secrets:
@@ -23,8 +20,8 @@ jobs:
       - name: Get project node id
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          ORGANIZATION: ${{ inputs.CALLER_ORGANIZATION }}
-          PROJECT_NUMBER: ${{ inputs.CALLER_PROJECT_NUMBER }}
+          ORGANIZATION: "informatics-isi-edu"
+          PROJECT_NUMBER: ${{ inputs.PROJECT_NUMBER }}
         run: |
           gh api graphql -f query='
             query($org: String!, $number: Int!) {
@@ -46,7 +43,7 @@ jobs:
       - name: Add newly opened issue/pull request to project board
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          ISSUE_ID: ${{ inputs.CALLER_NODE_ID }}
+          ISSUE_ID: ${{ inputs.NODE_ID }}
         run: |
           item_id="$( gh api graphql -f query='
             mutation($project:ID!, $issue:ID!) {
