@@ -7,7 +7,6 @@ jobs:
     uses: informatics-isi-edu/isrd-github-workflows/.github/workflows/add-existing-issues-to-project.yml@main
     with:
       PROJECT_NUMBER: #Add the project number for the project board.
-      ORGANIZATION: informatics-isi-edu
-      REPO_LINK: #Add the repository link with the issues. Example: /repos/informatics-isi-edu/isrd-github-workflows/issues
+      REPO_NAME: #Add the repository name with the issues. Example: isrd-github-workflows
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
