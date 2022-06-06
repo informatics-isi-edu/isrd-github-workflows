@@ -13,9 +13,8 @@ jobs:
     if: github.event_name == 'issues'
     uses: informatics-isi-edu/isrd-github-workflows/.github/workflows/add-new-issue-pr-to-project.yml@main
     with:
-      CALLER_PROJECT_NUMBER: #Add the project number for the project board.
-      CALLER_ORGANIZATION: informatics-isi-edu
-      CALLER_NODE_ID: ${{ github.event.issue.node_id }}
+      PROJECT_NUMBER: #Add the project number for the project board.
+      NODE_ID: ${{ github.event.issue.node_id }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
   
@@ -23,8 +22,7 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: informatics-isi-edu/isrd-github-workflows/.github/workflows/add-new-issue-pr-to-project.yml@main
     with:
-      CALLER_PROJECT_NUMBER: #Add the project number for the project board.
-      CALLER_ORGANIZATION: informatics-isi-edu
-      CALLER_NODE_ID: ${{ github.event.pull_request.node_id }}
+      PROJECT_NUMBER: #Add the project number for the project board.
+      NODE_ID: ${{ github.event.pull_request.node_id }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
