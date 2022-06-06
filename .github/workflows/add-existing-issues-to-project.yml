@@ -3,10 +3,7 @@ name: Add existing issues in a repository to the project board
 on:
   workflow_call:
     inputs:
-      REPO_LINK:
-        required: true
-        type: string
-      ORGANIZATION:
+      REPO_NAME:
         required: true
         type: string
       PROJECT_NUMBER:
@@ -26,13 +23,16 @@ jobs:
         id: set-matrix
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          ORGANIZATION: "informatics-isi-edu"
         run: |
-          gh api -H "Accept: application/vnd.github.v3+json" ${{ inputs.REPO_LINK }} > issues.json
+          gh api -H "Accept: application/vnd.github.v3+json" '/repos/${{ env.ORGANIZATION }}/${{ inputs.REPO_NAME }}/issues' > issues.json
           repo_issues=$(echo $(cat issues.json) | sed 's/ //g' )
           echo "::set-output name=matrix::{\"include\":${repo_issues}}"
           
   add_issues_to_repo:
     needs: get_repo_issues
+    env:
+        ORGANIZATION: "informatics-isi-edu"
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{fromJSON(needs.get_repo_issues.outputs.matrix)}}
@@ -55,8 +55,10 @@ jobs:
                   }
                 }
               }
-            }' -f org=${{ inputs.ORGANIZATION }} -F number=${{ inputs.PROJECT_NUMBER }} > project_data.json
+            }' -f org=$ORGANIZATION -F number=${{ inputs.PROJECT_NUMBER }} > project_data.json
           echo 'PROJECT_ID='$(jq '.data.organization.projectNext.id' project_data.json) >> $GITHUB_ENV
+
+
       - name: Add the existing issue to the project
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
