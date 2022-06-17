@@ -65,6 +65,8 @@ To manually achieve this, you can either:
 - Navigate to any of the views in your project and search for the issue.
 - Navigate to the issues page of a repository and bulk add issues to the project as demonstrated in [here](https://github.blog/changelog/2022-04-07-the-new-github-issues-april-7th-update/).
 
+> :warning: **[Because of the security implications](../../README.md#security-issues), we advise against using the following workflow for the time being.**
+
 To use the `add-existing-issues-to-project` workflow:
 
 1. Create a `.github/workflows` directory in your repository on GitHub if this directory does not already exist.
@@ -84,6 +86,8 @@ Using the above automated workflow adds only the open issues to the project boar
 ### Adding new issues or pull requests to the project
 
 When you create a new issue, it won't automatically add to the project, and you have to add it manually.
+
+> :warning: **[Because of the security implications](../../README.md#security-issues), we advise against using the following workflow for the time being.**
 
 To automate this, you may use the `add-new-project-item` workflow. To do so,
 
