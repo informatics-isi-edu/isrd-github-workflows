@@ -53,7 +53,7 @@ To create a project,
    - Related to the **Status** field:
       - Add any other extra options that you would like.
       - Based on the current implementation of GitHub Projects, the value of this field can be empty. In most cases, the default "Done" field means the same as empty. That's why we recommend removing the "Done" field.
-    - Add a new "Text" custom field and call it "Epic" to mimic ZenHub's epic feature.
+    - Add a new *Text** custom field and call it `Epic` to mimic ZenHub's epic feature. Since it's a freeform text, you cannot refer to the existing values while specifying the epic for a new issue, and you have to ensure you're consistently typing its value. The alternative to the **Text** type is **Single select**. While it will allow you to impose the structure, you won't be able to have more than 25 options. That's why we suggest using **text**.
   
 > Currently, this process cannot be automated.
 
