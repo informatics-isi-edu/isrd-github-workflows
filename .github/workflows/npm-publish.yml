@@ -27,7 +27,6 @@ jobs:
         uses: EndBug/version-check@v2
         with:
           file-url: ${{ inputs.repository-packagejson-url }}
-          assume-same-version: new
       - name: Publish new version
         if: steps.version-check.outputs.changed == 'true'
         run: |
