@@ -2,6 +2,11 @@ name: Detect version change and publish to npmjs
 
 on:
   workflow_call:
+    inputs:
+      repository-packagejson-url:
+        description: 'the url to the current package.json github page'
+        required: true
+        type: string
     secrets:
       NPM_AUTH_TOKEN:
         required: true
@@ -20,6 +25,8 @@ jobs:
       - name: Check if version has been updated
         id: version-check
         uses: EndBug/version-check@v2
+        with:
+          file-url: ${{ inputs.repository-packagejson-url }}
       - name: Publish new version
         if: steps.version-check.outputs.changed == 'true'
         run: |
